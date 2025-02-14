@@ -1,49 +1,49 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
+import { useRouter, Slot } from 'expo-router';
+import { ThemeProvider } from 'styled-components';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useAuth } from '../hooks/useAuth';
+interface LayoutProps {
+  loaded: boolean;
+  isAuthenticated: boolean;
+  segments: string[];
+  colorScheme: 'light' | 'dark';
+}
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const { isAuthenticated } = useAuth();
-  const segments = useSegments();
+const Layout: React.FC<LayoutProps> = ({ loaded, isAuthenticated, segments, colorScheme }) => {
   const router = useRouter();
-
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().then(() => {
+        setIsMounted(true);
+      });
     }
   }, [loaded]);
 
   useEffect(() => {
-    const inAuthGroup = segments[0] === '(auth)';
+    if (isMounted) {
+      const inAuthGroup = segments[0] === '(auth)';
 
-    if (!isAuthenticated && !inAuthGroup) {
-      router.replace('/login');
-    } else if (isAuthenticated && inAuthGroup) {
-      router.replace('/');
+      if (!isAuthenticated && !inAuthGroup) {
+        router.replace('/(auth)/login');
+      } else if (isAuthenticated && inAuthGroup) {
+        router.replace('/');
+      }
     }
-  }, [isAuthenticated, segments]);
+  }, [isAuthenticated, segments, isMounted]);
 
   if (!loaded) {
     return null;
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Slot />
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
@@ -52,4 +52,6 @@ export default function RootLayout() {
       <StatusBar style="auto" />
     </ThemeProvider>
   );
-}
+};
+
+export default Layout;

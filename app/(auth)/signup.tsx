@@ -13,7 +13,7 @@ export default function Signup() {
     // Implement signup logic here
     console.log('Signup with:', email, password);
     // If signup successful, navigate to main app
-    // router.replace('/');
+    router.replace('/');
   };
 
   return (
@@ -24,8 +24,6 @@ export default function Signup() {
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -34,17 +32,41 @@ export default function Signup() {
         onChangeText={setPassword}
         secureTextEntry
       />
-      {/* Add more input fields for other signup questions */}
       <TouchableOpacity style={styles.button} onPress={handleSignup}>
         <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push('/login')}>
-        <Text style={styles.linkText}>Already have an account? Log in</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  // ... (same styles as login.tsx)
+  container: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 16,
+  },
+  input: {
+    width: '100%',
+    padding: 8,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+  },
+  button: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: '#007BFF',
+    borderRadius: 4,
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: 16,
+  },
 });
